@@ -36,10 +36,10 @@ export function response(ctx) {
     // Parse the response body
     const parsedBody = JSON.parse(ctx.result.body);
     
-    // Safety check: if Bedrock returns an error message, pass it cleanly
-    if (parsedBody.message) {
+    // If Bedrock returns any error or message, pass the whole JSON back to the UI to read it
+    if (parsedBody.message || parsedBody.error) {
         return {
-            error: parsedBody.message,
+            error: JSON.stringify(parsedBody),
         };
     }
 
