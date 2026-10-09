@@ -1,11 +1,12 @@
 export function request(ctx) {
     const { ingredients = [] } = ctx.args;
  
+    // Construct the prompt with the provided ingredients
     const prompt = `Suggest a recipe idea using these ingredients: ${ingredients.join(", ")}.`;
  
+    // Return the request configuration with the required inference profile ID
     return {
-        // Use the clean base model ID that worked in your playground
-        resourcePath: `/model/anthropic.claude-haiku-4-5-20251001-v1:0/invoke`,
+        resourcePath: `/model/us.anthropic.claude-haiku-4-5-20251001-v1:0/invoke`,
         method: "POST",
         params: {
             headers: {
@@ -31,15 +32,21 @@ export function request(ctx) {
 }
  
 export function response(ctx) {
+    // Parse the response body
     const parsedBody = JSON.parse(ctx.result.body);
     
+    // If Bedrock returns any error, catch it cleanly
     if (parsedBody.message || parsedBody.error) {
         return {
             error: JSON.stringify(parsedBody),
         };
     }
 
-    return {
+    // Extract the text content from the successful response
+    const res = {
         body: parsedBody.content[0].text,
     };
+    
+    // Return the response
+    return res;
 }
