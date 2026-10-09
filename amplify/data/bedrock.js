@@ -1,13 +1,11 @@
 export function request(ctx) {
     const { ingredients = [] } = ctx.args;
  
-    // Construct the prompt with the provided ingredients
     const prompt = `Suggest a recipe idea using these ingredients: ${ingredients.join(", ")}.`;
  
-    // Return the request configuration
     return {
-        // Ensure this uses 'eu.' to match your eu-north-1 region deployment
-        resourcePath: `/model/eu.anthropic.claude-haiku-4-5-20251001-v1:0/invoke`,
+        // Use the clean base model ID that worked in your playground
+        resourcePath: `/model/anthropic.claude-haiku-4-5-20251001-v1:0/invoke`,
         method: "POST",
         params: {
             headers: {
@@ -33,21 +31,15 @@ export function request(ctx) {
 }
  
 export function response(ctx) {
-    // Parse the response body
     const parsedBody = JSON.parse(ctx.result.body);
     
-    // If Bedrock returns any error or message, pass the whole JSON back to the UI to read it
     if (parsedBody.message || parsedBody.error) {
         return {
             error: JSON.stringify(parsedBody),
         };
     }
 
-    // Extract the text content from the response
-    const res = {
+    return {
         body: parsedBody.content[0].text,
     };
-    
-    // Return the response
-    return res;
 }
